@@ -155,6 +155,193 @@ static const struct bin_attribute dpf_attrs_1 = {
 	.private = (void *)1
 };
 
+/*
+ * RC6 related definitions
+ */
+
+static ssize_t rc6_enable_show(struct device *dev,
+			       struct device_attribute *attr,
+			       char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t rc6_residency_ms_show(struct device *dev,
+				     struct device_attribute *attr,
+				     char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t rc6p_residency_ms_show(struct device *dev,
+				      struct device_attribute *attr,
+				      char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t rc6pp_residency_ms_show(struct device *dev,
+				       struct device_attribute *attr,
+				       char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t media_rc6_residency_ms_show(struct device *dev,
+					   struct device_attribute *attr,
+					   char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static struct device_attribute dev_attr_rc6_enable = __ATTR_RO(rc6_enable);
+static struct device_attribute dev_attr_rc6_residency_ms = __ATTR_RO(rc6_residency_ms);
+static struct device_attribute dev_attr_rc6p_residency_ms = __ATTR_RO(rc6p_residency_ms);
+static struct device_attribute dev_attr_rc6pp_residency_ms = __ATTR_RO(rc6pp_residency_ms);
+static struct device_attribute dev_attr_media_rc6_residency_ms = __ATTR_RO(media_rc6_residency_ms);
+
+static struct attribute *rc6_dev_attrs[] = {
+	&dev_attr_rc6_enable.attr,
+	&dev_attr_rc6_residency_ms.attr,
+	NULL
+};
+
+static struct attribute *rc6p_dev_attrs[] = {
+	&dev_attr_rc6p_residency_ms.attr,
+	&dev_attr_rc6pp_residency_ms.attr,
+	NULL
+};
+
+static struct attribute *media_rc6_dev_attrs[] = {
+	&dev_attr_media_rc6_residency_ms.attr,
+	NULL
+};
+
+static const struct attribute_group rc6_attr_group = {
+	.name = power_group_name,
+	.attrs = rc6_dev_attrs
+};
+
+static const struct attribute_group rc6p_attr_group = {
+	.name = power_group_name,
+	.attrs = rc6p_dev_attrs
+};
+
+static const struct attribute_group media_rc6_attr_group = {
+	.name = power_group_name,
+	.attrs = media_rc6_dev_attrs
+};
+
+/*
+ * RPS related definitions
+ */
+
+static ssize_t gt_act_freq_mhz_show(struct device *dev,
+				    struct device_attribute *attr,
+				    char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t gt_cur_freq_mhz_show(struct device *dev,
+				    struct device_attribute *attr,
+				    char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t gt_boost_freq_mhz_store(struct device *dev,
+				       struct device_attribute *attr,
+				       const char *buff, size_t count)
+{
+	return count;
+}
+
+static ssize_t gt_boost_freq_mhz_show(struct device *dev,
+				      struct device_attribute *attr,
+				      char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t gt_RP0_freq_mhz_show(struct device *dev,
+				    struct device_attribute *attr,
+				    char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t gt_RP1_freq_mhz_show(struct device *dev,
+				    struct device_attribute *attr,
+				    char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t gt_RPn_freq_mhz_show(struct device *dev,
+				    struct device_attribute *attr,
+				    char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t gt_max_freq_mhz_store(struct device *dev,
+				     struct device_attribute *attr,
+				     const char *buff, size_t count)
+{
+	return count;
+}
+
+static ssize_t gt_max_freq_mhz_show(struct device *dev,
+				    struct device_attribute *attr,
+				    char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t gt_min_freq_mhz_store(struct device *dev,
+				     struct device_attribute *attr,
+				     const char *buff, size_t count)
+{
+	return count;
+}
+
+static ssize_t gt_min_freq_mhz_show(struct device *dev,
+				    struct device_attribute *attr,
+				    char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static ssize_t gt_vlv_rpe_freq_mhz_show(struct device *dev,
+					struct device_attribute *attr,
+					char *buff)
+{
+	return sysfs_emit(buff, "%d\n", 0);
+}
+
+static struct device_attribute dev_attr_gt_act_freq_mhz = __ATTR_RO(gt_act_freq_mhz);
+static struct device_attribute dev_attr_gt_cur_freq_mhz = __ATTR_RO(gt_cur_freq_mhz);
+static struct device_attribute dev_attr_gt_boost_freq_mhz = __ATTR_RW(gt_boost_freq_mhz);
+static struct device_attribute dev_attr_gt_RP0_freq_mhz = __ATTR_RO(gt_RP0_freq_mhz);
+static struct device_attribute dev_attr_gt_RP1_freq_mhz = __ATTR_RO(gt_RP1_freq_mhz);
+static struct device_attribute dev_attr_gt_RPn_freq_mhz = __ATTR_RO(gt_RPn_freq_mhz);
+static struct device_attribute dev_attr_gt_max_freq_mhz = __ATTR_RW(gt_max_freq_mhz);
+static struct device_attribute dev_attr_gt_min_freq_mhz = __ATTR_RW(gt_min_freq_mhz);
+static struct device_attribute dev_attr_gt_vlv_rpe_freq_mhz = __ATTR_RO(gt_vlv_rpe_freq_mhz);
+
+static const struct attribute * const gen6_gt_attrs[]  = {
+	&dev_attr_gt_act_freq_mhz.attr,
+	&dev_attr_gt_cur_freq_mhz.attr,
+	&dev_attr_gt_boost_freq_mhz.attr,
+	&dev_attr_gt_max_freq_mhz.attr,
+	&dev_attr_gt_min_freq_mhz.attr,
+	&dev_attr_gt_RP0_freq_mhz.attr,
+	&dev_attr_gt_RP1_freq_mhz.attr,
+	&dev_attr_gt_RPn_freq_mhz.attr,
+	NULL,
+};
+
 void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 {
 	struct device *kdev = dev_priv->drm.primary->kdev;
@@ -183,6 +370,51 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 	i915_gpu_error_sysfs_setup(dev_priv);
 
 	intel_engines_add_sysfs(dev_priv);
+
+	/*
+	 * Create i915-wide sysfs interfaces.
+	 */
+
+	/* rc6 related sysfs interfaces */
+	ret = sysfs_merge_group(&kdev->kobj, &rc6_attr_group);
+	if (ret)
+		drm_warn(&dev_priv->drm,
+			 "failed to create RC6 sysfs files (%pe)\n",
+			 ERR_PTR(ret));
+
+	if (HAS_RC6p(dev_priv)) {
+		ret = sysfs_merge_group(&kdev->kobj, &rc6p_attr_group);
+		if (ret)
+			drm_warn(&dev_priv->drm,
+				 "failed to create RC6p sysfs files (%pe)\n",
+				 ERR_PTR(ret));
+	}
+
+	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv)) {
+		ret = sysfs_merge_group(&kdev->kobj, &media_rc6_attr_group);
+		if (ret)
+			drm_warn(&dev_priv->drm,
+				 "failed to create media RC6 sysfs files (%pe)\n",
+				 ERR_PTR(ret));
+	}
+
+	/* rps related sysfs interfaces */
+	if (GRAPHICS_VER(dev_priv) < 6)
+		return;
+
+	ret = sysfs_create_files(&kdev->kobj, gen6_gt_attrs);
+	if (ret)
+		drm_warn(&dev_priv->drm,
+			 "failed to create RPS sysfs files (%pe)", ERR_PTR(ret));
+
+	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv)) {
+		ret = sysfs_create_file(&kdev->kobj,
+					&dev_attr_gt_vlv_rpe_freq_mhz.attr);
+		if (ret)
+			drm_warn(&dev_priv->drm,
+				 "failed to create RPS sysfs files (%pe)",
+				 ERR_PTR(ret));
+	}
 }
 
 void i915_teardown_sysfs(struct drm_i915_private *dev_priv)

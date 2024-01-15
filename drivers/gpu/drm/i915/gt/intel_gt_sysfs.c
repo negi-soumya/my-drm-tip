@@ -46,11 +46,6 @@ struct intel_gt *intel_gt_sysfs_get_drvdata(struct kobject *kobj,
 	return kobj_to_gt(kobj);
 }
 
-static struct kobject *gt_get_parent_obj(struct intel_gt *gt)
-{
-	return &gt->i915->drm.primary->kdev->kobj;
-}
-
 static ssize_t id_show(struct kobject *kobj,
 		       struct kobj_attribute *attr,
 		       char *buf)
@@ -80,17 +75,6 @@ static const struct kobj_type kobj_gt_type = {
 
 void intel_gt_sysfs_register(struct intel_gt *gt)
 {
-	/*
-	 * We need to make things right with the
-	 * ABI compatibility. The files were originally
-	 * generated under the parent directory.
-	 *
-	 * We generate the files only for gt 0
-	 * to avoid duplicates.
-	 */
-	if (gt_is_root(gt))
-		intel_gt_sysfs_pm_init(gt, gt_get_parent_obj(gt));
-
 	/* init and xfer ownership to sysfs tree */
 	if (kobject_init_and_add(&gt->sysfs_gt, &kobj_gt_type,
 				 gt->i915->sysfs_gt, "gt%d", gt->info.id))

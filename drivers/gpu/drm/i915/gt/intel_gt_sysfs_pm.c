@@ -873,10 +873,6 @@ void intel_gt_sysfs_pm_init(struct intel_gt *gt, struct kobject *kobj)
 	if (ret)
 		gt_warn(gt, "failed to create RPS sysfs files (%pe)", ERR_PTR(ret));
 
-	/* end of the legacy interfaces */
-	if (!is_object_gt(kobj))
-		return;
-
 	ret = sysfs_create_file(kobj, &attr_punit_req_freq_mhz.attr);
 	if (ret)
 		gt_warn(gt, "failed to create punit_req_freq_mhz sysfs (%pe)", ERR_PTR(ret));
