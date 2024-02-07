@@ -136,12 +136,6 @@ sysfs_gt_attribute_r_func(struct kobject *kobj, struct attribute *attr,
 #define INTEL_GT_SYSFS_SHOW_MAX(_name) INTEL_GT_SYSFS_SHOW(_name, max)
 #define INTEL_GT_SYSFS_SHOW_MIN(_name) INTEL_GT_SYSFS_SHOW(_name, min)
 
-#define INTEL_GT_ATTR_RW(_name) \
-	static struct kobj_attribute attr_##_name = __ATTR_RW(_name)
-
-#define INTEL_GT_ATTR_RO(_name) \
-	static struct kobj_attribute attr_##_name = __ATTR_RO(_name)
-
 static u32 get_residency(struct intel_gt *gt, enum intel_rc6_res_type id)
 {
 	intel_wakeref_t wakeref;
@@ -201,11 +195,11 @@ INTEL_GT_SYSFS_SHOW_MIN(rc6p_residency_ms);
 INTEL_GT_SYSFS_SHOW_MIN(rc6pp_residency_ms);
 INTEL_GT_SYSFS_SHOW_MIN(media_rc6_residency_ms);
 
-INTEL_GT_ATTR_RO(rc6_enable);
-INTEL_GT_ATTR_RO(rc6_residency_ms);
-INTEL_GT_ATTR_RO(rc6p_residency_ms);
-INTEL_GT_ATTR_RO(rc6pp_residency_ms);
-INTEL_GT_ATTR_RO(media_rc6_residency_ms);
+static struct kobj_attribute attr_rc6_enable = __ATTR_RO(rc6_enable);
+static struct kobj_attribute attr_rc6_residency_ms = __ATTR_RO(rc6_residency_ms);
+static struct kobj_attribute attr_rc6p_residency_ms = __ATTR_RO(rc6p_residency_ms);
+static struct kobj_attribute attr_rc6pp_residency_ms = __ATTR_RO(rc6pp_residency_ms);
+static struct kobj_attribute attr_media_rc6_residency_ms = __ATTR_RO(media_rc6_residency_ms);
 
 static struct attribute *rc6_attrs[] = {
 	&attr_rc6_enable.attr,
@@ -438,7 +432,7 @@ struct intel_gt_bool_throttle_attr attr_##sysfs_func__ = { \
 	.mask = mask__, \
 }
 
-INTEL_GT_ATTR_RO(punit_req_freq_mhz);
+static struct kobj_attribute attr_punit_req_freq_mhz = __ATTR_RO(punit_req_freq_mhz);
 static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_status, GT0_PERF_LIMIT_REASONS_MASK);
 static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_pl1, POWER_LIMIT_1_MASK);
 static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_pl2, POWER_LIMIT_2_MASK);
@@ -616,13 +610,13 @@ static ssize_t media_RPn_freq_mhz_show(struct kobject *kobj,
 	return sysfs_emit(buff, "%u\n", val);
 }
 
-INTEL_GT_ATTR_RW(media_freq_factor);
+static struct kobj_attribute attr_media_freq_factor = __ATTR_RW(media_freq_factor);
 static struct kobj_attribute attr_media_freq_factor_scale =
 	__ATTR(media_freq_factor.scale, 0444, freq_factor_scale_show, NULL);
-INTEL_GT_ATTR_RO(media_RP0_freq_mhz);
-INTEL_GT_ATTR_RO(media_RPn_freq_mhz);
+static struct kobj_attribute attr_media_RP0_freq_mhz = __ATTR_RO(media_RP0_freq_mhz);
+static struct kobj_attribute attr_media_RPn_freq_mhz = __ATTR_RO(media_RPn_freq_mhz);
 
-INTEL_GT_ATTR_RW(slpc_ignore_eff_freq);
+static struct kobj_attribute attr_slpc_ignore_eff_freq = __ATTR_RW(slpc_ignore_eff_freq);
 
 static const struct attribute *media_perf_power_attrs[] = {
 	&attr_media_freq_factor.attr,
