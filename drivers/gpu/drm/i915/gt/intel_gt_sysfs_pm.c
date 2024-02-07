@@ -333,27 +333,25 @@ INTEL_GT_SYSFS_STORE(boost_freq_mhz, __boost_freq_mhz_store);
 INTEL_GT_SYSFS_STORE(max_freq_mhz, __set_max_freq);
 INTEL_GT_SYSFS_STORE(min_freq_mhz, __set_min_freq);
 
-#define INTEL_GT_RPS_SYSFS_ATTR(_name, _mode, _show, _store, _show_dev, _store_dev)		\
-	static struct kobj_attribute attr_rps_##_name = __ATTR(rps_##_name, _mode,		\
-							       _show, _store)
-
-#define INTEL_GT_RPS_SYSFS_ATTR_RO(_name)						\
-		INTEL_GT_RPS_SYSFS_ATTR(_name, 0444, _name##_show, NULL,		\
-					_name##_dev_show, NULL)
-#define INTEL_GT_RPS_SYSFS_ATTR_RW(_name)						\
-		INTEL_GT_RPS_SYSFS_ATTR(_name, 0644, _name##_show, _name##_store,	\
-					_name##_dev_show, _name##_dev_store)
-
 /* The below macros generate static structures */
-INTEL_GT_RPS_SYSFS_ATTR_RO(act_freq_mhz);
-INTEL_GT_RPS_SYSFS_ATTR_RO(cur_freq_mhz);
-INTEL_GT_RPS_SYSFS_ATTR_RW(boost_freq_mhz);
-INTEL_GT_RPS_SYSFS_ATTR_RO(RP0_freq_mhz);
-INTEL_GT_RPS_SYSFS_ATTR_RO(RP1_freq_mhz);
-INTEL_GT_RPS_SYSFS_ATTR_RO(RPn_freq_mhz);
-INTEL_GT_RPS_SYSFS_ATTR_RW(max_freq_mhz);
-INTEL_GT_RPS_SYSFS_ATTR_RW(min_freq_mhz);
-INTEL_GT_RPS_SYSFS_ATTR_RO(vlv_rpe_freq_mhz);
+static struct kobj_attribute attr_rps_act_freq_mhz =
+__ATTR(rps_act_freq_mhz, 0444, act_freq_mhz_show, NULL);
+static struct kobj_attribute attr_rps_cur_freq_mhz =
+__ATTR(rps_cur_freq_mhz, 0444, cur_freq_mhz_show, NULL);
+static struct kobj_attribute attr_rps_boost_freq_mhz =
+__ATTR(rps_boost_freq_mhz, 0644, boost_freq_mhz_show, boost_freq_mhz_store);
+static struct kobj_attribute attr_rps_RP0_freq_mhz =
+__ATTR(rps_RP0_freq_mhz, 0444, RP0_freq_mhz_show, NULL);
+static struct kobj_attribute attr_rps_RP1_freq_mhz =
+__ATTR(rps_RP1_freq_mhz, 0444, RP1_freq_mhz_show, NULL);
+static struct kobj_attribute attr_rps_RPn_freq_mhz =
+__ATTR(rps_RPn_freq_mhz, 0444, RPn_freq_mhz_show, NULL);
+static struct kobj_attribute attr_rps_max_freq_mhz =
+__ATTR(rps_max_freq_mhz, 0644, max_freq_mhz_show, max_freq_mhz_store);
+static struct kobj_attribute attr_rps_min_freq_mhz =
+__ATTR(rps_min_freq_mhz, 0644, min_freq_mhz_show, min_freq_mhz_store);
+static struct kobj_attribute attr_rps_vlv_rpe_freq_mhz =
+__ATTR(rps_vlv_rpe_freq_mhz, 0444, vlv_rpe_freq_mhz_show, NULL);
 
 static const struct attribute * const gen6_rps_attrs[] = {
 	&attr_rps_act_freq_mhz.attr,
