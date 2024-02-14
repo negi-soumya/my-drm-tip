@@ -110,29 +110,6 @@ sysfs_gt_attribute_r_func(struct kobject *kobj, struct attribute *attr,
 		return _name ##_show_common(kobj, &attr->attr, buff);				\
 	}											\
 
-#define INTEL_GT_SYSFS_STORE(_name, _func)						\
-	static ssize_t _name##_store_common(struct kobject *kobj,			\
-					    struct attribute *attr,			\
-					    const char *buff, size_t count)		\
-	{										\
-		int ret;								\
-		u32 val;								\
-											\
-		ret = kstrtou32(buff, 0, &val);						\
-		if (ret)								\
-			return ret;							\
-											\
-		ret = sysfs_gt_attribute_w_func(kobj, attr, _func, val);		\
-											\
-		return ret ?: count;							\
-	}										\
-	static ssize_t _name##_store(struct kobject *kobj,				\
-				     struct kobj_attribute *attr, const char *buff,	\
-				     size_t count)					\
-	{										\
-		return _name##_store_common(kobj, &attr->attr, buff, count);		\
-	}										\
-
 #define INTEL_GT_SYSFS_SHOW_MAX(_name) INTEL_GT_SYSFS_SHOW(_name, max)
 #define INTEL_GT_SYSFS_SHOW_MIN(_name) INTEL_GT_SYSFS_SHOW(_name, min)
 
@@ -329,9 +306,54 @@ INTEL_GT_SYSFS_SHOW_MAX(RPn_freq_mhz);
 INTEL_GT_SYSFS_SHOW_MAX(max_freq_mhz);
 INTEL_GT_SYSFS_SHOW_MIN(min_freq_mhz);
 INTEL_GT_SYSFS_SHOW_MAX(vlv_rpe_freq_mhz);
-INTEL_GT_SYSFS_STORE(boost_freq_mhz, __boost_freq_mhz_store);
-INTEL_GT_SYSFS_STORE(max_freq_mhz, __set_max_freq);
-INTEL_GT_SYSFS_STORE(min_freq_mhz, __set_min_freq);
+
+static ssize_t boost_freq_mhz_store(struct kobject *kobj,
+				    struct kobj_attribute *attr,
+				    const char *buff, size_t count)
+{
+	int ret;
+	u32 val;
+
+	ret = kstrtou32(buff, 0, &val);
+	if (ret)
+		return ret;
+
+	ret = sysfs_gt_attribute_w_func(kobj, &attr->attr, __boost_freq_mhz_store, val);
+
+	return ret ?: count;
+}
+
+static ssize_t max_freq_mhz_store(struct kobject *kobj,
+				  struct kobj_attribute *attr,
+				  const char *buff, size_t count)
+{
+	int ret;
+	u32 val;
+
+	ret = kstrtou32(buff, 0, &val);
+	if (ret)
+		return ret;
+
+	ret = sysfs_gt_attribute_w_func(kobj, &attr->attr, __set_max_freq, val);
+
+	return ret ?: count;
+}
+
+static ssize_t min_freq_mhz_store(struct kobject *kobj,
+				  struct kobj_attribute *attr,
+				  const char *buff, size_t count)
+{
+	int ret;
+	u32 val;
+
+	ret = kstrtou32(buff, 0, &val);
+	if (ret)
+		return ret;
+
+	ret = sysfs_gt_attribute_w_func(kobj, &attr->attr, __set_min_freq, val);
+
+	return ret ?: count;
+}
 
 /* The below macros generate static structures */
 static struct kobj_attribute attr_rps_act_freq_mhz =
