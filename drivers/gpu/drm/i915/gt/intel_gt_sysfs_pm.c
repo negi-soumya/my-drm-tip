@@ -422,24 +422,70 @@ static ssize_t throttle_reason_bool_show(struct kobject *kobj,
 	return sysfs_emit(buff, "%u\n", val);
 }
 
-#define INTEL_GT_RPS_BOOL_ATTR_RO(sysfs_func__, mask__) \
-struct intel_gt_bool_throttle_attr attr_##sysfs_func__ = { \
-	.attr = { .name = __stringify(sysfs_func__), .mode = 0444 }, \
-	.show = throttle_reason_bool_show, \
-	.reg32 = intel_gt_perf_limit_reasons_reg, \
-	.mask = mask__, \
-}
-
 static struct kobj_attribute attr_punit_req_freq_mhz = __ATTR_RO(punit_req_freq_mhz);
-static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_status, GT0_PERF_LIMIT_REASONS_MASK);
-static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_pl1, POWER_LIMIT_1_MASK);
-static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_pl2, POWER_LIMIT_2_MASK);
-static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_pl4, POWER_LIMIT_4_MASK);
-static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_thermal, THERMAL_LIMIT_MASK);
-static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_prochot, PROCHOT_MASK);
-static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_ratl, RATL_MASK);
-static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_vr_thermalert, VR_THERMALERT_MASK);
-static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_vr_tdc, VR_TDC_MASK);
+
+struct intel_gt_bool_throttle_attr attr_throttle_reason_status = {
+	.attr = { .name = "throttle_reason_status", .mode = 0444 },
+	.show = throttle_reason_bool_show,
+	.reg32 = intel_gt_perf_limit_reasons_reg,
+	.mask = GT0_PERF_LIMIT_REASONS_MASK,
+};
+
+struct intel_gt_bool_throttle_attr attr_throttle_reason_pl1 = {
+	.attr = { .name = "throttle_reason_pl1", .mode = 0444 },
+	.show = throttle_reason_bool_show,
+	.reg32 = intel_gt_perf_limit_reasons_reg,
+	.mask = POWER_LIMIT_1_MASK,
+};
+
+struct intel_gt_bool_throttle_attr attr_throttle_reason_pl2 = {
+	.attr = { .name = "throttle_reason_pl2", .mode = 0444 },
+	.show = throttle_reason_bool_show,
+	.reg32 = intel_gt_perf_limit_reasons_reg,
+	.mask = POWER_LIMIT_2_MASK,
+};
+
+struct intel_gt_bool_throttle_attr attr_throttle_reason_pl4 = {
+	.attr = { .name = "throttle_reason_pl4", .mode = 0444 },
+	.show = throttle_reason_bool_show,
+	.reg32 = intel_gt_perf_limit_reasons_reg,
+	.mask = POWER_LIMIT_4_MASK,
+};
+
+struct intel_gt_bool_throttle_attr attr_throttle_reason_thermal = {
+	.attr = { .name = "throttle_reason_thermal", .mode = 0444 },
+	.show = throttle_reason_bool_show,
+	.reg32 = intel_gt_perf_limit_reasons_reg,
+	.mask = THERMAL_LIMIT_MASK,
+};
+
+struct intel_gt_bool_throttle_attr attr_throttle_reason_prochot = {
+	.attr = { .name = "throttle_reason_prochot", .mode = 0444 },
+	.show = throttle_reason_bool_show,
+	.reg32 = intel_gt_perf_limit_reasons_reg,
+	.mask = PROCHOT_MASK,
+};
+
+struct intel_gt_bool_throttle_attr attr_throttle_reason_ratl = {
+	.attr = { .name = "throttle_reason_ratl", .mode = 0444 },
+	.show = throttle_reason_bool_show,
+	.reg32 = intel_gt_perf_limit_reasons_reg,
+	.mask = RATL_MASK,
+};
+
+struct intel_gt_bool_throttle_attr attr_throttle_reason_vr_thermalert = {
+	.attr = { .name = "throttle_reason_vr_thermalert", .mode = 0444 },
+	.show = throttle_reason_bool_show,
+	.reg32 = intel_gt_perf_limit_reasons_reg,
+	.mask = VR_THERMALERT_MASK,
+};
+
+struct intel_gt_bool_throttle_attr attr_throttle_reason_vr_tdc = {
+	.attr = { .name = "throttle_reason_vr_tdc", .mode = 0444 },
+	.show = throttle_reason_bool_show,
+	.reg32 = intel_gt_perf_limit_reasons_reg,
+	.mask = VR_TDC_MASK,
+};
 
 static const struct attribute *throttle_reason_attrs[] = {
 	&attr_throttle_reason_status.attr,
