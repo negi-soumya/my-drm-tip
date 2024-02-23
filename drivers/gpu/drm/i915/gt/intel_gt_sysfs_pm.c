@@ -24,31 +24,6 @@ enum intel_gt_sysfs_op {
 	INTEL_GT_SYSFS_MAX,
 };
 
-static int
-sysfs_gt_attribute_w_func(struct kobject *kobj, struct attribute *attr,
-			  int (func)(struct intel_gt *gt, u32 val), u32 val)
-{
-	struct intel_gt *gt;
-	int ret;
-
-	if (!is_object_gt(kobj)) {
-		int i;
-		struct device *dev = kobj_to_dev(kobj);
-		struct drm_i915_private *i915 = kdev_minor_to_i915(dev);
-
-		for_each_gt(gt, i915, i) {
-			ret = func(gt, val);
-			if (ret)
-				break;
-		}
-	} else {
-		gt = intel_gt_sysfs_get_drvdata(kobj, attr->name);
-		ret = func(gt, val);
-	}
-
-	return ret;
-}
-
 static u32 get_residency(struct intel_gt *gt, enum intel_rc6_res_type id)
 {
 	intel_wakeref_t wakeref;
@@ -186,21 +161,6 @@ static void intel_sysfs_rc6_init(struct intel_gt *gt, struct kobject *kobj)
 	}
 }
 
-static int __boost_freq_mhz_store(struct intel_gt *gt, u32 val)
-{
-	return intel_rps_set_boost_frequency(&gt->rps, val);
-}
-
-static int __set_max_freq(struct intel_gt *gt, u32 val)
-{
-	return intel_rps_set_max_frequency(&gt->rps, val);
-}
-
-static int __set_min_freq(struct intel_gt *gt, u32 val)
-{
-	return intel_rps_set_min_frequency(&gt->rps, val);
-}
-
 static ssize_t act_freq_mhz_show(struct kobject *kobj,
 				 struct kobj_attribute *attr, char *buff)
 {
@@ -299,12 +259,14 @@ static ssize_t boost_freq_mhz_store(struct kobject *kobj,
 {
 	int ret;
 	u32 val;
+	struct intel_gt *gt;
 
 	ret = kstrtou32(buff, 0, &val);
 	if (ret)
 		return ret;
 
-	ret = sysfs_gt_attribute_w_func(kobj, &attr->attr, __boost_freq_mhz_store, val);
+	gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	ret = intel_rps_set_boost_frequency(&gt->rps, val);
 
 	return ret ?: count;
 }
@@ -315,12 +277,14 @@ static ssize_t max_freq_mhz_store(struct kobject *kobj,
 {
 	int ret;
 	u32 val;
+	struct intel_gt *gt;
 
 	ret = kstrtou32(buff, 0, &val);
 	if (ret)
 		return ret;
 
-	ret = sysfs_gt_attribute_w_func(kobj, &attr->attr, __set_max_freq, val);
+	gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	ret = intel_rps_set_max_frequency(&gt->rps, val);
 
 	return ret ?: count;
 }
@@ -331,12 +295,14 @@ static ssize_t min_freq_mhz_store(struct kobject *kobj,
 {
 	int ret;
 	u32 val;
+	struct intel_gt *gt;
 
 	ret = kstrtou32(buff, 0, &val);
 	if (ret)
 		return ret;
 
-	ret = sysfs_gt_attribute_w_func(kobj, &attr->attr, __set_min_freq, val);
+	gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	ret = intel_rps_set_min_frequency(&gt->rps, val);
 
 	return ret ?: count;
 }
