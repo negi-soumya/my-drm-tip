@@ -49,44 +49,6 @@ sysfs_gt_attribute_w_func(struct kobject *kobj, struct attribute *attr,
 	return ret;
 }
 
-static u32
-sysfs_gt_attribute_r_func(struct kobject *kobj, struct attribute *attr,
-			  u32 (func)(struct intel_gt *gt),
-			  enum intel_gt_sysfs_op op)
-{
-	struct intel_gt *gt;
-	u32 ret;
-
-	ret = (op == INTEL_GT_SYSFS_MAX) ? 0 : (u32) -1;
-
-	if (!is_object_gt(kobj)) {
-		int i;
-		struct device *dev = kobj_to_dev(kobj);
-		struct drm_i915_private *i915 = kdev_minor_to_i915(dev);
-
-		for_each_gt(gt, i915, i) {
-			u32 val = func(gt);
-
-			switch (op) {
-			case INTEL_GT_SYSFS_MIN:
-				if (val < ret)
-					ret = val;
-				break;
-
-			case INTEL_GT_SYSFS_MAX:
-				if (val > ret)
-					ret = val;
-				break;
-			}
-		}
-	} else {
-		gt = intel_gt_sysfs_get_drvdata(kobj, attr->name);
-		ret = func(gt);
-	}
-
-	return ret;
-}
-
 static u32 get_residency(struct intel_gt *gt, enum intel_rc6_res_type id)
 {
 	intel_wakeref_t wakeref;
@@ -121,33 +83,12 @@ static ssize_t rc6_enable_show(struct kobject *kobj,
 	return sysfs_emit(buff, "%x\n", get_rc6_mask(gt));
 }
 
-static u32 __rc6_residency_ms_show(struct intel_gt *gt)
-{
-	return get_residency(gt, INTEL_RC6_RES_RC6);
-}
-
-static u32 __rc6p_residency_ms_show(struct intel_gt *gt)
-{
-	return get_residency(gt, INTEL_RC6_RES_RC6p);
-}
-
-static u32 __rc6pp_residency_ms_show(struct intel_gt *gt)
-{
-	return get_residency(gt, INTEL_RC6_RES_RC6pp);
-}
-
-static u32 __media_rc6_residency_ms_show(struct intel_gt *gt)
-{
-	return get_residency(gt, INTEL_RC6_RES_VLV_MEDIA);
-}
-
 static ssize_t rc6_residency_ms_show(struct kobject *kobj,
 				     struct kobj_attribute *attr, char *buff)
 {
 	/* RC6 interfaces will show the minimum RC6 residency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __rc6_residency_ms_show,
-					    INTEL_GT_SYSFS_MIN);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = get_residency(gt, INTEL_RC6_RES_RC6);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -156,9 +97,8 @@ static ssize_t rc6p_residency_ms_show(struct kobject *kobj,
 				      struct kobj_attribute *attr, char *buff)
 {
 	/* RC6 interfaces will show the minimum RC6 residency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __rc6p_residency_ms_show,
-					    INTEL_GT_SYSFS_MIN);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = get_residency(gt, INTEL_RC6_RES_RC6p);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -167,9 +107,8 @@ static ssize_t rc6pp_residency_ms_show(struct kobject *kobj,
 				       struct kobj_attribute *attr, char *buff)
 {
 	/* RC6 interfaces will show the minimum RC6 residency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __rc6pp_residency_ms_show,
-					    INTEL_GT_SYSFS_MIN);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = get_residency(gt, INTEL_RC6_RES_RC6pp);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -178,9 +117,8 @@ static ssize_t media_rc6_residency_ms_show(struct kobject *kobj,
 					   struct kobj_attribute *attr, char *buff)
 {
 	/* RC6 interfaces will show the minimum RC6 residency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __media_rc6_residency_ms_show,
-					    INTEL_GT_SYSFS_MIN);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = get_residency(gt, INTEL_RC6_RES_VLV_MEDIA);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -248,44 +186,9 @@ static void intel_sysfs_rc6_init(struct intel_gt *gt, struct kobject *kobj)
 	}
 }
 
-static u32 __act_freq_mhz_show(struct intel_gt *gt)
-{
-	return intel_rps_read_actual_frequency(&gt->rps);
-}
-
-static u32 __cur_freq_mhz_show(struct intel_gt *gt)
-{
-	return intel_rps_get_requested_frequency(&gt->rps);
-}
-
-static u32 __boost_freq_mhz_show(struct intel_gt *gt)
-{
-	return intel_rps_get_boost_frequency(&gt->rps);
-}
-
 static int __boost_freq_mhz_store(struct intel_gt *gt, u32 val)
 {
 	return intel_rps_set_boost_frequency(&gt->rps, val);
-}
-
-static u32 __RP0_freq_mhz_show(struct intel_gt *gt)
-{
-	return intel_rps_get_rp0_frequency(&gt->rps);
-}
-
-static u32 __RPn_freq_mhz_show(struct intel_gt *gt)
-{
-	return intel_rps_get_rpn_frequency(&gt->rps);
-}
-
-static u32 __RP1_freq_mhz_show(struct intel_gt *gt)
-{
-	return intel_rps_get_rp1_frequency(&gt->rps);
-}
-
-static u32 __max_freq_mhz_show(struct intel_gt *gt)
-{
-	return intel_rps_get_max_frequency(&gt->rps);
 }
 
 static int __set_max_freq(struct intel_gt *gt, u32 val)
@@ -293,30 +196,17 @@ static int __set_max_freq(struct intel_gt *gt, u32 val)
 	return intel_rps_set_max_frequency(&gt->rps, val);
 }
 
-static u32 __min_freq_mhz_show(struct intel_gt *gt)
-{
-	return intel_rps_get_min_frequency(&gt->rps);
-}
-
 static int __set_min_freq(struct intel_gt *gt, u32 val)
 {
 	return intel_rps_set_min_frequency(&gt->rps, val);
-}
-
-static u32 __vlv_rpe_freq_mhz_show(struct intel_gt *gt)
-{
-	struct intel_rps *rps = &gt->rps;
-
-	return intel_gpu_freq(rps, rps->efficient_freq);
 }
 
 static ssize_t act_freq_mhz_show(struct kobject *kobj,
 				 struct kobj_attribute *attr, char *buff)
 {
 	/* Frequency interfaces will show the maximum frequency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __act_freq_mhz_show,
-					    INTEL_GT_SYSFS_MAX);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = intel_rps_read_actual_frequency(&gt->rps);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -325,9 +215,8 @@ static ssize_t boost_freq_mhz_show(struct kobject *kobj,
 				   struct kobj_attribute *attr, char *buff)
 {
 	/* Frequency interfaces will show the maximum frequency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __boost_freq_mhz_show,
-					    INTEL_GT_SYSFS_MAX);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = intel_rps_get_boost_frequency(&gt->rps);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -336,9 +225,8 @@ static ssize_t cur_freq_mhz_show(struct kobject *kobj,
 				 struct kobj_attribute *attr, char *buff)
 {
 	/* Frequency interfaces will show the maximum frequency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __cur_freq_mhz_show,
-					    INTEL_GT_SYSFS_MAX);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = intel_rps_get_requested_frequency(&gt->rps);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -347,9 +235,8 @@ static ssize_t RP0_freq_mhz_show(struct kobject *kobj,
 				 struct kobj_attribute *attr, char *buff)
 {
 	/* Frequency interfaces will show the maximum frequency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __RP0_freq_mhz_show,
-					    INTEL_GT_SYSFS_MAX);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = intel_rps_get_rp0_frequency(&gt->rps);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -358,9 +245,8 @@ static ssize_t RP1_freq_mhz_show(struct kobject *kobj,
 				 struct kobj_attribute *attr, char *buff)
 {
 	/* Frequency interfaces will show the maximum frequency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __RP1_freq_mhz_show,
-					    INTEL_GT_SYSFS_MAX);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = intel_rps_get_rp1_frequency(&gt->rps);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -369,9 +255,8 @@ static ssize_t RPn_freq_mhz_show(struct kobject *kobj,
 				 struct kobj_attribute *attr, char *buff)
 {
 	/* Frequency interfaces will show the maximum frequency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __RPn_freq_mhz_show,
-					    INTEL_GT_SYSFS_MAX);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = intel_rps_get_rpn_frequency(&gt->rps);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -380,9 +265,8 @@ static ssize_t max_freq_mhz_show(struct kobject *kobj,
 				 struct kobj_attribute *attr, char *buff)
 {
 	/* Frequency interfaces will show the maximum frequency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __max_freq_mhz_show,
-					    INTEL_GT_SYSFS_MAX);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = intel_rps_get_max_frequency(&gt->rps);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -391,9 +275,8 @@ static ssize_t min_freq_mhz_show(struct kobject *kobj,
 				 struct kobj_attribute *attr, char *buff)
 {
 	/* RC6 interfaces will show the minimum RC6 residency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __min_freq_mhz_show,
-					    INTEL_GT_SYSFS_MIN);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	u32 val = intel_rps_get_min_frequency(&gt->rps);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
@@ -402,9 +285,10 @@ static ssize_t vlv_rpe_freq_mhz_show(struct kobject *kobj,
 				     struct kobj_attribute *attr, char *buff)
 {
 	/* Frequency interfaces will show the maximum frequency value */
-	u32 val = sysfs_gt_attribute_r_func(kobj, &attr->attr,
-					    __vlv_rpe_freq_mhz_show,
-					    INTEL_GT_SYSFS_MAX);
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+	struct intel_rps *rps = &gt->rps;
+
+	u32 val = intel_gpu_freq(rps, rps->efficient_freq);
 
 	return sysfs_emit(buff, "%u\n", val);
 }
