@@ -18,11 +18,6 @@
 #include "intel_gt_types.h"
 #include "intel_rc6.h"
 
-bool is_object_gt(struct kobject *kobj)
-{
-	return !strncmp(kobj->name, "gt", 2);
-}
-
 static ssize_t id_show(struct kobject *kobj,
 		       struct kobj_attribute *attr,
 		       char *buf)

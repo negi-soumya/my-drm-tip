@@ -14,8 +14,6 @@
 
 struct intel_gt;
 
-bool is_object_gt(struct kobject *kobj);
-
 struct drm_i915_private *kobj_to_i915(struct kobject *kobj);
 
 static inline struct intel_gt *kobj_to_gt(struct kobject *kobj)
